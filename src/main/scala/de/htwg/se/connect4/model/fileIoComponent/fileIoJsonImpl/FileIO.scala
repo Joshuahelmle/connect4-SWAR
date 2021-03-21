@@ -15,14 +15,13 @@ import scala.io.Source
 class FileIO extends FileIoInterface {
 
   override def load: (BoardInterface, State) = {
-    var board: BoardInterface = null
     val source: String = Source.fromFile("board.json").getLines.mkString
     val json: JsValue = Json.parse(source)
 
     val sizeOfRows = (json \ "board" \ "row").get.toString.toInt
     val sizeOfCols = (json \ "board" \ "col").get.toString.toInt
 
-    board = BoardSizeStrategy.execute(sizeOfRows, sizeOfCols)
+    var board = BoardSizeStrategy.execute(sizeOfRows, sizeOfCols)
 
     val injector = {
       Guice.createInjector(new Connect4Module)
@@ -40,7 +39,7 @@ class FileIO extends FileIoInterface {
     }
 
     val currentPlayerIndex = (json \ "currentPlayerIndex").get.toString().toInt
-    var players: List[Player] = Nil
+    var players: List[Player] = List()
 
     for (index <- 0 until 2) {
       val name = (json \ "players" \\ "name") (index).as[String]
@@ -50,7 +49,7 @@ class FileIO extends FileIoInterface {
 
 
       val player = new Player(name, color, piecesLeft)
-      players = players ::: player :: Nil
+      players = players ::: List(player)
 
     }
 

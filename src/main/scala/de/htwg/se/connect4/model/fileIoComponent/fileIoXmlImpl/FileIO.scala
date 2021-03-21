@@ -13,7 +13,6 @@ class FileIO extends FileIoInterface {
 
 
   override def load: (BoardInterface, State) = {
-    var board: BoardInterface = null
     val file = scala.xml.XML.loadFile("board.xml")
     val rowAttr = file \\ "game"  \\ "board" \ "@row"
     val colAttr = file \\ "game" \\ "board" \  "@col"
@@ -21,7 +20,7 @@ class FileIO extends FileIoInterface {
     val sizeOfRows = rowAttr.text.toInt
     val sizeOfCols = colAttr.text.toInt
 
-    board = BoardSizeStrategy.execute(sizeOfRows, sizeOfCols)
+    var board = BoardSizeStrategy.execute(sizeOfRows, sizeOfCols)
 
     val cellNodes = file \\ "cell"
     for (cell <- cellNodes) {
@@ -35,7 +34,7 @@ class FileIO extends FileIoInterface {
 
     val currentPlayerIndex: Int = (file \\ "game" \\ "@currentPlayerIndex").text.toInt
     val stateString: String = (file \\ "game" \\ "@stateString").text
-    var players: List[Player] = Nil
+    var players: List[Player] = List()
 
     val playerNodes = (file \\ "player")
     for (player <- playerNodes) {
@@ -45,7 +44,7 @@ class FileIO extends FileIoInterface {
       val piecesLeft: Int = (player \ "@piecesLeft").text.toInt
 
       val playerObject = new Player(name, color, piecesLeft)
-      players = players ::: playerObject :: Nil
+      players = players ::: List(playerObject)
 
     }
 

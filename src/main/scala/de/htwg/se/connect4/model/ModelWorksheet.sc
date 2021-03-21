@@ -80,10 +80,7 @@ case class Board(cells: Matrix[Cell]) {
   }
 
   val player = Player("lisa", "rot")
-  //player.piecesLeft
   val updatedPlayer = player.setPiece()
-  //updatedPlayer.piecesLeft
-  //updatedPlayer.playerName
 
 
 

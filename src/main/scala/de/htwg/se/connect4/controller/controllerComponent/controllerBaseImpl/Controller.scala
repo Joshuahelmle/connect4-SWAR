@@ -98,10 +98,11 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
 
   def addPlayer(input: String): String = {
     if (players.isEmpty) {
-      players = players ::: playerComponent.Player(input, Color.RED) :: Nil
+      players = players ::: List(playerComponent.Player(input, Color.RED))
+
     }
     else if (players.size < 2) {
-      players = players ::: playerComponent.Player(input, Color.YELLOW) :: Nil
+      players = players ::: List(playerComponent.Player(input, Color.YELLOW))
       triggerNextStateAndEvaluateInput
     }
     else triggerNextStateAndEvaluateInput
@@ -111,9 +112,9 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
   def createNewBoard(rows: Int, cols: Int): String = {
     board = BoardSizeStrategy.execute((rows, cols))
     currentPlayerIndex = 0
-    var newPlayers: List[Player] = Nil
-    newPlayers = newPlayers ::: players.head.copy(piecesLeft = 21) :: Nil
-    newPlayers = newPlayers ::: players(1).copy(piecesLeft = 21) :: Nil
+    var newPlayers: List[Player] = List()
+    newPlayers = newPlayers ::: List(players.head.copy(piecesLeft = 21) )
+    newPlayers = newPlayers ::: List(players(1).copy(piecesLeft = 21))
     players = newPlayers
     state = InGameState(this)
     notifyObservers

@@ -14,7 +14,7 @@ class SwingGui(controller: ControllerInterface) extends Frame with Observer {
   controller.add(this)
   title = "Connect 4"
 
-  var cells = Array.ofDim[CellPanel](controller.sizeOfRows, controller.sizeOfCols)
+  val cells = Array.ofDim[CellPanel](controller.sizeOfRows, controller.sizeOfCols)
   val statusLine = {
     new Label(controller.stateString)
   }
