@@ -80,8 +80,10 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
   }
 
   def playerWin(row: Int, col: Int): Boolean = {
-    val matchInCols = board.checkCols(col, players(currentPlayerIndex).color)
-    val matchInRows = board.checkRow(row, players(currentPlayerIndex).color)
+    val matchInCols = board.hasWon((x,y) => (x+1,y), players(currentPlayerIndex).color, 0, (-1,col))
+    val matchInRows =  board.hasWon((x,y) => (x,y+1), players(currentPlayerIndex).color, 0, (row,-1))
+    //val matchInCols = board.checkCols(col, players(currentPlayerIndex).color)
+    //val matchInRows = board.checkRow(row, players(currentPlayerIndex).color)
     val matchDiagonal = board.checkDiagonal(row, col, players(currentPlayerIndex).color)
 
     matchInCols || matchInRows || matchDiagonal

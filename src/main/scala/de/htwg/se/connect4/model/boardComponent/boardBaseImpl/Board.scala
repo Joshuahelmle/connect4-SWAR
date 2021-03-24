@@ -24,7 +24,20 @@ case class Board @Inject() (cells: Matrix[Cell]) extends BoardInterface {
 
   def set(row: Int, col: Int, color: Color.Value, isSet: Boolean): Board = copy(cells.replaceCell(row, col, Cell(isSet, color)))
 
+  def hasWon(directionFunc : (Int, Int) => (Int, Int), color : Color, counter : Int, currentIdx : (Int, Int)): Boolean ={
+    if(counter == 4) return true
+    val newIndicies = directionFunc(currentIdx._1, currentIdx._2)
+    if(newIndicies._1 >= sizeOfRows || newIndicies._2 >= sizeOfCols) return false
+    var newCounter = 0;
+    if(cell(newIndicies._1, newIndicies._2).color == color){
+      newCounter = counter +1;
+    }
+    hasWon(directionFunc, color, newCounter, newIndicies)
+  }
+
   def checkRow(row: Int, color: Color): Boolean = {
+    hasWon((y,x) => (y, x+1), color, 0, (row,-1))
+    /*
     var pieces = new ListBuffer[Color]()
     for (col <- 0 until sizeOfCols) {
       pieces += cell(row, col).color
@@ -38,10 +51,12 @@ case class Board @Inject() (cells: Matrix[Cell]) extends BoardInterface {
     }
 
 
-    if (counter >= 4) true else false
+    if (counter >= 4) true else false*/
   }
 
   def checkCols(col: Int, color: Color): Boolean = {
+    hasWon((y,x) => (y+1, x), color, 0, (-1,col))
+    /*
     var pieces = new ListBuffer[Color]()
     for (row <- 0 until sizeOfRows) {
       pieces += cell(row, col).color
@@ -56,7 +71,7 @@ case class Board @Inject() (cells: Matrix[Cell]) extends BoardInterface {
 
 
     if (counter >= 4) true else false
-
+*/
   }
 
   def checkDiagonal(row: Int, col: Int, playerColor: Color): Boolean =

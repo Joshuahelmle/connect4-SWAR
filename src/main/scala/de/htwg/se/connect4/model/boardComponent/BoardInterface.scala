@@ -17,9 +17,11 @@ trait BoardInterface {
 
   def set(row: Int, col: Int, color: Color.Value, isSet: Boolean): Board
 
-  def checkRow(row: Int, color: Color): Boolean
+  def hasWon(func : (Int, Int) => (Int, Int), color : Color, counter : Int, currentIdx : (Int, Int)) : Boolean
 
-  def checkCols(col: Int, color: Color): Boolean
+  //def checkRow(row: Int, color: Color): Boolean
+
+  //def checkCols(col: Int, color: Color): Boolean
 
   def checkDiagonal(row: Int, col: Int, playerColor: Color): Boolean
 
