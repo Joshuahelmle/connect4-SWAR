@@ -4,6 +4,8 @@ import de.htwg.se.connect4.controller.controllerComponent.ControllerInterface
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
 import de.htwg.se.connect4.util.Observer
 
+import scala.util.{Failure, Success, Try}
+
 class Tui(controller: ControllerInterface) extends Observer {
 
   val rows: Int = 6
@@ -21,7 +23,12 @@ class Tui(controller: ControllerInterface) extends Observer {
       case "s" => controller.save
       case "l" => controller.load
 
-      case _ => controller.handle(input, board)
+      case _ => {
+        controller.handle(input, board) match {
+          case Success(value) => ""
+          case Failure(exception) => exception.getMessage
+        }
+      }
 
     }
   }

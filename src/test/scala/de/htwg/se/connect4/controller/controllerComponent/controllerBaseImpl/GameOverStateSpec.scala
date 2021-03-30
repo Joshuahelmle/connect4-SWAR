@@ -7,6 +7,8 @@ import de.htwg.se.connect4.model.playerComponent.Player
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+import scala.util.{Failure, Success}
+
 
 class GameOverStateSpec extends AnyWordSpec with Matchers {
   "A Game Over State" should {
@@ -52,7 +54,11 @@ class GameOverStateSpec extends AnyWordSpec with Matchers {
     controller.state = GameOverState(controller)
 
     "return empty String" in {
-      controller.handle("", board) should startWith ("")
+      controller.handle("", board) match {
+        case Success(value) => value should
+       startWith ("")
+        case Failure(exception) => exception.getMessage should startWith(controller.getIncorrectInputMessage)
+      }
     }
 
     "return string representation" in {

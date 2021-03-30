@@ -28,7 +28,7 @@ class PlayerWinStateSpec extends AnyWordSpec with Matchers {
     }
 
     "return empty string" in {
-      controller.handle("", board) should startWith("")
+      controller.handle("", board).get should startWith("")
     }
 
     "return string representation" in {

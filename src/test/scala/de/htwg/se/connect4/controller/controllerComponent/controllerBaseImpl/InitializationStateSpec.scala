@@ -22,7 +22,7 @@ class InitializationStateSpec extends AnyWordSpec with Matchers {
     }
 
     "set should add players" in {
-      controller.handle("test2", board) should startWith("")
+      controller.handle("test2", board).get should startWith("")
 
     }
 

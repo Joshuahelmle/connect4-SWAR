@@ -6,13 +6,15 @@ import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Cell
 import de.htwg.se.connect4.model.playerComponent.Player
 import de.htwg.se.connect4.util.Observable
 
+import scala.util.Try
+
 trait ControllerInterface extends Observable {
 
   def stateString: String
 
   def getWelcomeString: String
 
-  def handle(input: String, board: BoardInterface): String
+  def handle(input: String, board: BoardInterface): Try[String]
 
   def save: String
 

@@ -7,9 +7,9 @@ import scala.util.{Failure, Success, Try}
 
 case class InGameState(controller: ControllerInterface) extends ControllerState {
 
-  override def handle(input: String, board: BoardInterface): String = evaluateInput(input, board)
+  override def handle(input: String, board: BoardInterface): Try[String] = evaluateInput(input, board)
 
-  def evaluateInput(input: String, board: BoardInterface): String = {
+  def evaluateInput(input: String, board: BoardInterface): Try[String] = {
     val list: Try[List[Int]] = Try(input.toList.filter(c => c != ' ').map(c => c.toString.toInt))
 
     list match {
@@ -18,13 +18,13 @@ case class InGameState(controller: ControllerInterface) extends ControllerState 
         if (list.get.size == 2) {
           val row: Int = list.get.head
           val column: Int = list.get(1)
-          if (row < board.sizeOfRows && column < board.sizeOfCols) controller.setCol(column)
-          else controller.getIncorrectInputMessage
+          if (row < board.sizeOfRows && column < board.sizeOfCols) Try(controller.setCol(column))
+          else Failure(new Exception(controller.getIncorrectInputMessage))
         }
 
-        else controller.getIncorrectInputMessage
+        else Failure(new Exception(controller.getIncorrectInputMessage))
 
-      case Failure(e) => controller.getIncorrectInputMessage
+      case Failure(e) => Failure(new Exception(controller.getIncorrectInputMessage))
     }
   }
 

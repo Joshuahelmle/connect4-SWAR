@@ -11,6 +11,8 @@ import de.htwg.se.connect4.model.playerComponent.Player
 import de.htwg.se.connect4.util.{Observable, UndoManager}
 import net.codingwell.scalaguice.InjectorExtensions._
 
+import scala.util.Try
+
 
 class Controller @Inject()(var board: BoardInterface, var players: List[Player]) extends Observable with ControllerInterface {
 
@@ -24,7 +26,7 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
   def stateString: String = state.stateString()
 
 
-  def handle(input: String, board: BoardInterface): String = {
+  def handle(input: String, board: BoardInterface): Try[String] = {
     state.handle(input, board)
   }
 
