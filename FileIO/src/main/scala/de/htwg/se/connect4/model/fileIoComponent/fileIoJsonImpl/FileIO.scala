@@ -1,9 +1,8 @@
-package main.model.fileIoJsonImpl
+package de.htwg.se.connect4.model.fileIoComponent.fileIoJsonImpl
 
 import com.google.inject.Guice
 import de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl.State
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
-import main.model.FileIoInterface
 import com.google.inject.Guice
 import de.htwg.se.connect4.Connect4Module
 import de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl.State
@@ -15,7 +14,6 @@ import de.htwg.se.connect4.model.playerComponent.Player
 import play.api.libs.json._
 
 import scala.io.Source
-
 import scala.io.Source
 import scala.io.Source
 

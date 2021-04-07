@@ -3,13 +3,13 @@ package de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl
 import com.google.inject.{Guice, Inject}
 import de.htwg.se.connect4.Connect4Module
 import de.htwg.se.connect4.controller.controllerComponent.ControllerInterface
-import de.htwg.se.connect4.model.boardComponent.BoardInterface
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{BoardSizeStrategy, Cell, Color}
 import de.htwg.se.connect4.model.fileIoComponent.FileIoInterface
 import de.htwg.se.connect4.model.playerComponent
 import de.htwg.se.connect4.model.playerComponent.Player
 import de.htwg.se.connect4.util.{Observable, UndoManager}
 import net.codingwell.scalaguice.InjectorExtensions._
+import de.htwg.se.connect4.model.boardComponent.BoardInterface
 
 import scala.util.Try
 

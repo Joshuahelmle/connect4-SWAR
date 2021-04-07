@@ -1,3 +1,7 @@
+
+lazy val root = (project in file(".")).aggregate(fileio, board)
+lazy val fileio = (project in file("FileIO"))
+lazy val board = (project in file("Board"))
 name := "Vier-Gewinnt"
 
 version := "0.1"

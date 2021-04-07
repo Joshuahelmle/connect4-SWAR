@@ -2,9 +2,11 @@ package de.htwg.se.connect4.model.fileIoComponent.fileIoXmlImpl
 
 import de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl.{Controller, State}
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{Board, Color}
+import de.htwg.se.connect4.model.fileIoComponent.fileIoJsonImpl.FileIO
 import de.htwg.se.connect4.model.playerComponent.Player
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+
 
 
 class FileIoSpec extends AnyWordSpec with Matchers {
