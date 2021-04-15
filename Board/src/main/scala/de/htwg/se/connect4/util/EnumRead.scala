@@ -2,7 +2,6 @@ package de.htwg.se.connect4.util
 
 import play.api.libs.json._
 
-
 object EnumRead {
   def enumReads[E <: Enumeration](enum: E): Reads[E#Value] = new Reads[E#Value] {
     def reads(json: JsValue): JsResult[E#Value] = json match {
@@ -20,5 +19,3 @@ object EnumRead {
   }
 
 }
-
-

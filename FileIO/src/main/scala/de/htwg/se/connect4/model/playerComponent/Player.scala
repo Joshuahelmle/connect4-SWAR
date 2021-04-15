@@ -1,7 +1,7 @@
 package de.htwg.se.connect4.model.playerComponent
 
-import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Color
 import play.api.libs.json.Json
+import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Color
 
 case class Player(playerName: String, color: Color.Value, piecesLeft: Int = 21) {
 

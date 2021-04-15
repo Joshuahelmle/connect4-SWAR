@@ -37,41 +37,11 @@ case class Board @Inject() (cells: Matrix[Cell]) extends BoardInterface {
 
   def checkRow(row: Int, color: Color): Boolean = {
     hasWon((y,x) => (y, x+1), color, 0, (row,-1))
-    /*
-    var pieces = new ListBuffer[Color]()
-    for (col <- 0 until sizeOfCols) {
-      pieces += cell(row, col).color
-    }
-    var counter = 0
-    breakable {
-      for (elem <- pieces) {
-        if (elem.equals(color)) counter += 1 else counter = 0
-        if(counter >= 4) break
-      }
-    }
 
-
-    if (counter >= 4) true else false*/
   }
 
   def checkCols(col: Int, color: Color): Boolean = {
     hasWon((y,x) => (y+1, x), color, 0, (-1,col))
-    /*
-    var pieces = new ListBuffer[Color]()
-    for (row <- 0 until sizeOfRows) {
-      pieces += cell(row, col).color
-    }
-    var counter = 0
-    breakable {
-      for (elem <- pieces) {
-        if (elem.equals(color)) counter += 1 else counter = 0
-        if(counter >= 4) break
-      }
-    }
-
-
-    if (counter >= 4) true else false
-*/
   }
 
   def checkDiagonal(row: Int, col: Int, playerColor: Color): Boolean =

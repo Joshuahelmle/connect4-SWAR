@@ -1,24 +1,41 @@
-package de.htwg.se.connect4.model.fileIoComponent.fileIoJsonImpl
+package de.htwg.se.connect4.controller
 
-
+import com.google.inject.Guice
+import de.htwg.se.connect4.FileIOServerModule
+import de.htwg.se.connect4.model.boardComponent.BoardInterface
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.BoardSizeStrategy
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Color.Color
-import de.htwg.se.connect4.model.boardComponent.{BoardInterface, CellInterface}
 import de.htwg.se.connect4.model.fileIoComponent.{FileIoInterface, State}
 import de.htwg.se.connect4.model.playerComponent.Player
+import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import play.api.libs.json._
 
-import scala.io.Source
+class FileIOController {
 
-class FileIO extends FileIoInterface {
+  val injector = Guice.createInjector(new FileIOServerModule)
+  val fileIO = injector.instance[FileIoInterface]
+  val games = Seq("board.json")
 
-  override def load: (BoardInterface, State) = {
-    val source: String = Source.fromFile("board.json").getLines.mkString
-    val json: JsValue = Json.parse(source)
+  def getAsJson(id : Int): JsValue = {
+    val (board, state) = fileIO.load
+    gridToJson(board, state)
+  }
+
+  def getAllGames() : JsValue = {
+  Json.obj("games" -> Json.toJson(for {game <- games } yield {
+      Json.obj(
+        "game" -> game
+      )
+    })
+
+    )
+  }
+
+  def save(payload : String): Unit ={
+    val json: JsValue = Json.parse(payload)
 
     val sizeOfRows = (json \ "board" \ "row").get.toString.toInt
     val sizeOfCols = (json \ "board" \ "col").get.toString.toInt
-    println(sizeOfCols, sizeOfRows)
 
     var board = BoardSizeStrategy.execute(sizeOfRows, sizeOfCols)
 
@@ -54,17 +71,8 @@ class FileIO extends FileIoInterface {
 
     val stateToLoad = new State(currentPlayerIndex, players, state)
 
-    (board, stateToLoad)
-
+    fileIO.save(board, stateToLoad)
   }
-
-  override def save(board: BoardInterface, state: State): Unit = {
-    import java.io._
-    val pw = new PrintWriter(new File("board.json"))
-    pw.write(Json.prettyPrint(gridToJson(board, state)))
-    pw.close
-  }
-
 
   def gridToJson(board: BoardInterface, state: State) = {
     Json.obj(
@@ -102,13 +110,8 @@ class FileIO extends FileIoInterface {
     )
   }
 
-  implicit val cellWrites = new Writes[CellInterface] {
-    def writes(cell: CellInterface) = Json.obj(
-      "isSet" -> cell.isSet,
-      "color" -> cell.color
+  /*def save(id : Int) : Unit = {
+    fileIO.save()
+  }*/
 
-    )
-  }
 }
-
-

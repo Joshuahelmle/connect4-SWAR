@@ -1,4 +1,4 @@
-package de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl
+package de.htwg.se.connect4.model.fileIoComponent
 
 import de.htwg.se.connect4.model.playerComponent.Player
 

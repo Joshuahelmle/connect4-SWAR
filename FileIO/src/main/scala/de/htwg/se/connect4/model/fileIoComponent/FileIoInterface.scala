@@ -1,7 +1,8 @@
 package de.htwg.se.connect4.model.fileIoComponent
 
-import de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl.State
+import de.htwg.se.connect4.model.fileIoComponent.State
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
+import play.api.libs.json.JsValue
 
 trait FileIoInterface {
 

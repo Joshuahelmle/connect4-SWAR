@@ -1,17 +1,26 @@
 package de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl
 
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.client.RequestBuilding.{Get, Post}
+import akka.http.scaladsl.model.{HttpResponse, StatusCode, StatusCodes}
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.google.inject.{Guice, Inject}
 import de.htwg.se.connect4.Connect4Module
 import de.htwg.se.connect4.controller.controllerComponent.ControllerInterface
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{BoardSizeStrategy, Cell, Color}
-import de.htwg.se.connect4.model.fileIoComponent.FileIoInterface
+import de.htwg.se.connect4.model.fileIoComponent.{FileIoInterface, State}
 import de.htwg.se.connect4.model.playerComponent
 import de.htwg.se.connect4.model.playerComponent.Player
 import de.htwg.se.connect4.util.{Observable, UndoManager}
 import net.codingwell.scalaguice.InjectorExtensions._
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
+import play.api.libs.json.JsValue.jsValueToJsLookup
+import play.api.libs.json.Json
 
-import scala.util.Try
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 
 class Controller @Inject()(var board: BoardInterface, var players: List[Player]) extends Observable with ControllerInterface {
@@ -33,6 +42,35 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
   def getWelcomeString: String = "Welcome to connect 4. Please Enter your names."
 
   def setCol(col : Int) : String = {
+
+    val payload = Json.obj(
+      "col" -> col,
+      "color" -> players(currentPlayerIndex).color
+    )
+    implicit val system = ActorSystem(Behaviors.empty, "SingleRequest")
+    // needed for the future flatMap/onComplete in the end
+    implicit val executionContext = system.executionContext
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(Post("http://localhost:9003/board", payload.toString()))
+    responseFuture.onComplete{
+      case Success(res) => {
+        if (res.status == StatusCodes.OK) {
+          val responseBody : Future[String] = Unmarshal(res.entity).to[String]
+          responseBody.onComplete{
+            case Success(body) => {
+              val b = Json.parse(body)
+              val idx = (b \ "idx").as[Int]
+              return set(idx,col)
+            }
+            case Failure(_) => sys.error("Error in setCol")
+          }
+        } else {
+          notifyObservers
+          return "Cell is already set. Please chose different one."
+        }
+      }
+      case Failure(_) => sys.error("Error in setCol")
+    }
+    /*
     var idx = board.sizeOfRows-1
     var found = false;
     while(!found && idx >= 0){
@@ -40,12 +78,14 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
       idx -= 1
     }
     if(found) {
-     return set(idx+1,col)
+     return
     }
     else {
       notifyObservers
       "Cell is already set. Please chose different one."
     }
+    */
+    ""
   }
 
 

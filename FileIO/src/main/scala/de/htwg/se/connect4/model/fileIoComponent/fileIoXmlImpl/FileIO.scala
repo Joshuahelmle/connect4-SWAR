@@ -1,11 +1,12 @@
 package main.model.fileIoXmlImpl
 
-import de.htwg.se.connect4.controller.controllerComponent.controllerBaseImpl.State
+
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{BoardSizeStrategy, Color}
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Color.Color
-import de.htwg.se.connect4.model.fileIoComponent.FileIoInterface
+import de.htwg.se.connect4.model.fileIoComponent.{FileIoInterface, State}
 import de.htwg.se.connect4.model.playerComponent.Player
+
 import scala.xml.PrettyPrinter
 
 class FileIO extends FileIoInterface {
