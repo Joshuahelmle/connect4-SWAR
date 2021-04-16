@@ -16,25 +16,29 @@ lazy val dockerSettings = Seq(
 enablePlugins(JavaAppPackaging)
 lazy val global = project.in(file(".")).settings(libraryDependencies ++= commonDependencies
 ).settings(dockerBaseImage := "hseeberger/scala-sbt:8u222_1.3.5_2.13.1")
+  .settings(daemonUser in Docker := "sbtuser")
   .settings(dockerExposedPorts := Seq(9000))
-  .settings(daemonUser := "sbtuser")
+  .settings(mainClass in Compile := Some("de.htwg.se.connect4.connect4"))
   .aggregate(board, fileio)
   .dependsOn(board,fileio)
-  .enablePlugins(sbtdocker.DockerPlugin)
+  .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging)
 
 lazy val board = project.in(file("Board")).settings(libraryDependencies ++= commonDependencies
 )
   .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging)
   .settings(dockerBaseImage := "hseeberger/scala-sbt:8u222_1.3.5_2.13.1")
-  .settings(dockerExposedPorts := Seq(9003))
-  .settings(daemonUser := "sbtuser")
+  .settings(daemonUser in Docker := "sbtuser")
   .settings(mainClass in Compile := Some("de.htwg.se.connect4.BoardManager"))
+  .settings(dockerExposedPorts := Seq(9003))
+
 lazy val fileio = project.in(file("FileIO")).settings(libraryDependencies ++= commonDependencies
 ).dependsOn(board)
-  .enablePlugins(sbtdocker.DockerPlugin)
+  .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging)
   .settings(dockerBaseImage := "hseeberger/scala-sbt:8u222_1.3.5_2.13.1")
+  .settings(daemonUser in Docker:= "sbtuser")
+  .settings(mainClass in Compile := Some("de.htwg.se.connect4.FileIOServer"))
   .settings(dockerExposedPorts := Seq(9002))
-  .settings(daemonUser := "sbtuser")
+
 
 
 

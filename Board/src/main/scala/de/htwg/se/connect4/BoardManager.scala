@@ -36,7 +36,9 @@ object BoardManager {
               val col = (json \ "col").as[Int]
               val color = (json \ "color" \ "color").as[Color]
               val possible = controller.set(col, color)
+              println(possible._2)
               if (possible._1) {
+                println(possible._2)
                 val payload = Json.obj("idx" -> possible._2)
                 complete(HttpEntity(ContentTypes.`application/json`, payload.toString()))
               } else {
