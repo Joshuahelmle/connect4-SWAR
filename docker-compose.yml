@@ -1,0 +1,15 @@
+fileio:
+  image: fileio:0.1.0-SNAPSHOT<localBuild>
+  ports:
+    - "9002:9002"
+  stdin_open: true
+
+board:
+  image: board:0.1.0-SNAPSHOT<localBuild>
+  ports:
+    - "9003:9003"
+  stdin_open: true
+
+
+
+

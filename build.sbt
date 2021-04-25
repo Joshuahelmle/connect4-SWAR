@@ -1,19 +1,7 @@
-/*import sbtassembly.AssemblyKeys
-import sbtdocker.DockerKeys._
 
-lazy val dockerSettings = Seq(
-  docker <<= (docker dependsOn (AssemblyKeys.assembly in global)),
-  dockerfile in docker := {
-    val artifact : File = (AssemblyKeys.assemblyOutputPath in AssemblyKeys.assembly in global).value
-    val artifactPath = s"/app/${artifact.name}"
-    new Dockerfile{
-      from("hseeberger/scala-sbt:8u212_1.2.8_2.13.0")
-      add(artifact, artifactPath)
-    }
-  }
-)
-*/
-enablePlugins(JavaAppPackaging)
+enablePlugins(JavaAppPackaging, DockerComposePlugin)
+dockerImageCreationTask := docker.value
+val dockerAppPath = "/app/"
 lazy val global = project.in(file(".")).settings(libraryDependencies ++= commonDependencies
 ).settings(dockerBaseImage := "hseeberger/scala-sbt:8u222_1.3.5_2.13.1")
   .settings(daemonUser in Docker := "sbtuser")
@@ -21,7 +9,19 @@ lazy val global = project.in(file(".")).settings(libraryDependencies ++= commonD
   .settings(mainClass in Compile := Some("de.htwg.se.connect4.connect4"))
   .aggregate(board, fileio)
   .dependsOn(board,fileio)
-  .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging)
+  .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging, DockerComposePlugin)
+  .settings(imageNames in docker := Seq(ImageName(repository = name.value.toLowerCase, tag = Some("latest"))))
+  .settings(
+    dockerfile in docker := {
+      new Dockerfile {
+        val mainClassString = (mainClass in Compile).value.get
+        val classpath = (fullClasspath in Compile).value
+        from("java")
+        add(classpath.files, dockerAppPath)
+        entryPoint("java", "-cp", s"$dockerAppPath:$dockerAppPath/*", s"$mainClassString")
+      }
+    }
+  )
 
 lazy val board = project.in(file("Board")).settings(libraryDependencies ++= commonDependencies
 )
@@ -30,14 +30,39 @@ lazy val board = project.in(file("Board")).settings(libraryDependencies ++= comm
   .settings(daemonUser in Docker := "sbtuser")
   .settings(mainClass in Compile := Some("de.htwg.se.connect4.BoardManager"))
   .settings(dockerExposedPorts := Seq(9003))
+  .settings(imageNames in docker := Seq(ImageName(repository = name.value.toLowerCase, tag = Some("latest"))))
+  .settings(
+    dockerfile in docker := {
+      new Dockerfile {
+        val mainClassString = (mainClass in Compile).value.get
+        val classpath = (fullClasspath in Compile).value
+        from("java")
+        add(classpath.files, dockerAppPath)
+        entryPoint("java", "-cp", s"$dockerAppPath:$dockerAppPath/*", s"$mainClassString")
+      }
+    }
+  )
 
 lazy val fileio = project.in(file("FileIO")).settings(libraryDependencies ++= commonDependencies
 ).dependsOn(board)
-  .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging)
+  .enablePlugins(sbtdocker.DockerPlugin, JavaAppPackaging, DockerComposePlugin)
   .settings(dockerBaseImage := "hseeberger/scala-sbt:8u222_1.3.5_2.13.1")
   .settings(daemonUser in Docker:= "sbtuser")
   .settings(mainClass in Compile := Some("de.htwg.se.connect4.FileIOServer"))
   .settings(dockerExposedPorts := Seq(9002))
+  .settings(imageNames in docker := Seq(ImageName(repository = name.value.toLowerCase, tag = Some("latest"))))
+  .settings(
+    dockerfile in docker := {
+      new Dockerfile {
+        val mainClassString = (mainClass in Compile).value.get
+        val classpath = (fullClasspath in Compile).value
+        from("java")
+        add(classpath.files, dockerAppPath)
+        entryPoint("java", "-cp", s"$dockerAppPath:$dockerAppPath/*", s"$mainClassString")
+      }
+    }
+  )
+  .settings(libraryDependencies ++= Seq(dependencies.slick, dependencies.slf4jNop))
 
 
 
@@ -58,6 +83,9 @@ lazy val dependencies =
     val scalaguice = "net.codingwell" %% "scala-guice" % "4.2.11"
     val playjson = "com.typesafe.play" %% "play-json" % "2.9.1"
     val scalaxml = "org.scala-lang.modules" %% "scala-xml" % "2.0.0-M2"
+    val slick = "com.typesafe.slick" %% "slick" % "3.3.3"
+    val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.6.4"
+
   }
 
 val commonDependencies =  Seq(

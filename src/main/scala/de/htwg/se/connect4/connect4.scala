@@ -31,21 +31,8 @@ object connect4 {
   controller.notifyObservers
 
 
-  def main(args: Array[String]): Unit = {/*
-    implicit val system = ActorSystem(Behaviors.empty, "SingleRequest")
-    // needed for the future flatMap/onComplete in the end
-    implicit val executionContext = system.executionContext
-    val responseFuture: Future[HttpResponse] = Http().singleRequest(Get("http://localhost:9002/game"))
-    responseFuture.onComplete{
-      case Success(res) => {
-        val entityAsText : Future[String] = Unmarshal(res.entity).to[String]
-        entityAsText.onComplete{
-          case Success(body) => println(body)
-          case Failure(_) => println("something Wrong")
-        }
-      }
-      case Failure(_) => sys.error("something wrong")
-    }*/
+  def main(args: Array[String]): Unit = {
+
     var input: String = ""
     do {
 

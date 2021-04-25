@@ -1,0 +1,4 @@
+board:
+  image: board:latest
+  ports:
+    - "0:9003"
