@@ -85,6 +85,7 @@ lazy val dependencies =
     val scalaxml = "org.scala-lang.modules" %% "scala-xml" % "2.0.0-M2"
     val slick = "com.typesafe.slick" %% "slick" % "3.3.3"
     val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.6.4"
+    val postgres = "org.postgresql" % "postgresql" % "42.2.13"
 
   }
 
