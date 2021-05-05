@@ -6,7 +6,6 @@ database:
   environment:
     - POSTGRES_USER=root
     - POSTGRES_PASSWORD=1234
-    - POSTGRES_MULTIPLE_DATABASES=boards,players,games
 
 
 
