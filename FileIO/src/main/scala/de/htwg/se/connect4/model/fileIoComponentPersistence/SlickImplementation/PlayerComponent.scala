@@ -4,7 +4,7 @@ import slick.ast.ColumnOption.PrimaryKey
 import slick.jdbc.PostgresProfile.api._
 
 
-class PlayerComponent(tag: Tag) extends Table[(Option[Int], String, String, Int)](tag, "boards") {
+class PlayerComponent(tag: Tag) extends Table[(Option[Int], String, String, Int, Int)](tag, "players") {
 
   val boards = TableQuery[BoardComponent]
 
@@ -15,9 +15,10 @@ class PlayerComponent(tag: Tag) extends Table[(Option[Int], String, String, Int)
   def color = column[String]("color")
 
   def piecesLeft = column[Int]("pieces left")
+  def boardID = column[Int]("boardID")
 
-  def boardFK = foreignKey("boardFK", id, boards)(
+  def boardFK = foreignKey("boardFK", boardID, boards)(
     _.id, onUpdate = ForeignKeyAction.Cascade, onDelete = ForeignKeyAction.Cascade)
 
-  override def * = (id.?, name, color, piecesLeft)
+  override def * = (id.?, name, color, piecesLeft, boardID)
 }

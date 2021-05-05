@@ -202,6 +202,12 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
 
   override def save: String = {
     val stateToSave = State(currentPlayerIndex, players, state.toString())
+    /*implicit val system = ActorSystem(Behaviors.empty, "SingleRequest")
+    // needed for the future flatMap/onComplete in the end
+    implicit val executionContext = system.executionContext
+    val payload = board.getBoardAsString()
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(Post("http://localhost:9002/board", payload.toString()))
+*/
     fileIo.save(board, stateToSave)
     "saved"
   }

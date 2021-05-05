@@ -99,7 +99,8 @@ val commonDependencies =  Seq(
   dependencies.playjson,
   dependencies.scalaxml,
   dependencies.akkaactor,
-  dependencies.akkastream
+  dependencies.akkastream,
+  dependencies.postgres
 )
 
 name := "Vier-Gewinnt-SWAR"

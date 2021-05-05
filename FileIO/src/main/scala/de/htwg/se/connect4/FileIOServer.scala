@@ -28,6 +28,7 @@ object FileIOServer {
 
     val controller: FileIOController = new FileIOController()
 
+
     val route = concat(
       path("games") {
         get {
@@ -45,9 +46,15 @@ object FileIOServer {
             complete(HttpEntity(ContentTypes.`text/plain(UTF-8)` ,"Game Saved!"))
           }
         })
+      },
+      path("newGame") {
+        concat(
+          get {
+            complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, controller.create().toString))
+          }
+        )
       }
     )
-
     val bindingFuture = Http().bindAndHandle(route, connectionInterface, connectionPort)
 
     println(s"Server online at http://$connectionInterface:$connectionPort/\nPress RETURN to stop...")

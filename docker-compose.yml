@@ -1,14 +1,14 @@
-fileio:
-  image: fileio:0.1.0-SNAPSHOT<localBuild>
+database:
+  image: "postgres"
+  container_name: "database"
   ports:
-    - "9002:9002"
-  stdin_open: true
+    - "5432:5432"
+  environment:
+    - POSTGRES_USER=root
+    - POSTGRES_PASSWORD=1234
+    - POSTGRES_MULTIPLE_DATABASES=boards,players,games
 
-board:
-  image: board:0.1.0-SNAPSHOT<localBuild>
-  ports:
-    - "9003:9003"
-  stdin_open: true
+
 
 
 

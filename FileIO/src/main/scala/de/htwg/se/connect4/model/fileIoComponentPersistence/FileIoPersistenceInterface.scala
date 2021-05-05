@@ -12,4 +12,5 @@ trait FileIoPersistenceInterface {
   def delete(id: Int) : Boolean
 
   def read(id : Int) : Option[(List[Player], Board)]
+ // def setupDB()
 }

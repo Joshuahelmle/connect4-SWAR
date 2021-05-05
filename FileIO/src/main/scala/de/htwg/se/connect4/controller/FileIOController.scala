@@ -3,9 +3,10 @@ package de.htwg.se.connect4.controller
 import com.google.inject.Guice
 import de.htwg.se.connect4.FileIOServerModule
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
-import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.BoardSizeStrategy
+import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{BoardSizeStrategy, Color}
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Color.Color
 import de.htwg.se.connect4.model.fileIoComponent.{FileIoInterface, State}
+import de.htwg.se.connect4.model.fileIoComponentPersistence.FileIoPersistenceInterface
 import de.htwg.se.connect4.model.playerComponent.Player
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import play.api.libs.json._
@@ -14,6 +15,7 @@ class FileIOController {
 
   val injector = Guice.createInjector(new FileIOServerModule)
   val fileIO = injector.instance[FileIoInterface]
+  val databaseIO = injector.instance[FileIoPersistenceInterface]
   val games = Seq("board.json")
 
   def getAsJson(id : Int): JsValue = {
@@ -113,5 +115,9 @@ class FileIOController {
   /*def save(id : Int) : Unit = {
     fileIO.save()
   }*/
+
+  def create() : Int = {
+    databaseIO.create(List(Player("Josh", Color.RED, 21), Player("Test", Color.YELLOW, 21)), 5, 5)
+  }
 
 }
