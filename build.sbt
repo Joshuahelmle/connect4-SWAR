@@ -86,6 +86,7 @@ lazy val dependencies =
     val slick = "com.typesafe.slick" %% "slick" % "3.3.3"
     val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.6.4"
     val postgres = "org.postgresql" % "postgresql" % "42.2.13"
+    val mongodb = "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0"
 
   }
 
@@ -100,7 +101,8 @@ val commonDependencies =  Seq(
   dependencies.scalaxml,
   dependencies.akkaactor,
   dependencies.akkastream,
-  dependencies.postgres
+  dependencies.postgres,
+  dependencies.mongodb
 )
 
 name := "Vier-Gewinnt-SWAR"

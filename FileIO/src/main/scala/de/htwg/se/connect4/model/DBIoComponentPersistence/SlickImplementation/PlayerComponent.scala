@@ -1,4 +1,4 @@
-package de.htwg.se.connect4.model.fileIoComponentPersistence.SlickImplementation
+package de.htwg.se.connect4.model.DBIoComponentPersistence.SlickImplementation
 
 import slick.ast.ColumnOption.PrimaryKey
 import slick.jdbc.PostgresProfile.api._

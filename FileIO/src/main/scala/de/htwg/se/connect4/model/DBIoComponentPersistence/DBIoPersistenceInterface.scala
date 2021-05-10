@@ -1,9 +1,9 @@
-package de.htwg.se.connect4.model.fileIoComponentPersistence
+package de.htwg.se.connect4.model.DBIoComponentPersistence
 
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Board
 import de.htwg.se.connect4.model.playerComponent.Player
 
-trait FileIoPersistenceInterface {
+trait DBIoPersistenceInterface {
 
   def create(players: List[Player], rows : Int, cols: Int) : Int
 
