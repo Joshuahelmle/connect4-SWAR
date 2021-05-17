@@ -38,6 +38,24 @@ class Controller {
       case Failure(_) => sys.error("something wrong")
     }
   }
+
+  def loadBoard(id : String): Unit ={
+    implicit val actorSystem: ActorSystem = ActorSystem("actorSystem")
+    implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(Get("http://localhost:9002/game"))
+    responseFuture.onComplete {
+      case Success(res) => {
+        println(res)
+        val entityAsText: Future[String] = Unmarshal(res.entity).to[String]
+        entityAsText.onComplete {
+          case Success(body) => load(body)
+          case Failure(_) => println("something Wrong")
+        }
+      }
+      case Failure(_) => sys.error("something wrong")
+    }
+  }
  def load(payload : String) : Board = {
     println(payload)
     val json: JsValue = Json.parse(payload)

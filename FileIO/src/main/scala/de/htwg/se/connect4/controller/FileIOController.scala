@@ -1,15 +1,20 @@
 package de.htwg.se.connect4.controller
 
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.client.RequestBuilding.Post
 import com.google.inject.Guice
 import de.htwg.se.connect4.FileIOServerModule
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
-import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{BoardSizeStrategy, Color}
+import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{Board, BoardSizeStrategy, Color}
 import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.Color.Color
 import de.htwg.se.connect4.model.fileIoComponent.{FileIoInterface, State}
-import de.htwg.se.connect4.model.DBIoComponentPersistence.{DBIoPersistenceInterface}
+import de.htwg.se.connect4.model.DBIoComponentPersistence.DBIoPersistenceInterface
+import de.htwg.se.connect4.model.DBIoComponentPersistence.MongoDBImplementation.BoardComponent
 import de.htwg.se.connect4.model.playerComponent.Player
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import play.api.libs.json._
+
+import scala.collection.mutable.ListBuffer
 
 class FileIOController {
 
@@ -72,8 +77,9 @@ class FileIOController {
     val state = (json \ "state").as[String]
 
     val stateToLoad = new State(currentPlayerIndex, players, state)
-
+    val id = (json \ "id").as[String]
     fileIO.save(board, stateToLoad)
+    databaseIO.update(id, players, board)
   }
 
   def gridToJson(board: BoardInterface, state: State) = {
@@ -116,8 +122,41 @@ class FileIOController {
     fileIO.save()
   }*/
 
-  def create() : Int = {
-    databaseIO.create(List(Player("Josh", Color.RED, 21), Player("Test", Color.YELLOW, 21)), 5, 5)
+  def create(payload : String) : String = {
+    val json: JsValue = Json.parse(payload)
+    var players: List[Player] = List()
+
+    for (index <- 0 until 2) {
+      val name = (json \ "players" \\ "name") (index).as[String]
+      val piecesLeft = (json \ "players" \\ "piecesLeft") (index).as[Int]
+      val playerColor = (json \ "players") (index)("color")
+      val color = (playerColor \ "color").as[Color]
+
+
+      val player = new Player(name, color, piecesLeft)
+      players = players ::: List(player)
+
+    }
+    val id = databaseIO.create(players, 6, 7)
+
+    Json.obj("id" -> id).toString()
   }
 
+
+  def update(id : String) = {
+    val players = List(Player("Vanessa", Color.RED, 2), Player("Test", Color.YELLOW, 21))
+    var b = new Board(5,5,false)
+    b = b.set(3,3,Color.RED, true)
+
+
+    databaseIO.update(id, players, b)
+  }
+
+  def delete(id : String) = {
+    databaseIO.delete(id)
+  }
+
+  def test(): String = {
+    databaseIO.test()
+  }
 }

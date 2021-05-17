@@ -16,8 +16,9 @@ import de.htwg.se.connect4.model.playerComponent.Player
 import de.htwg.se.connect4.util.{Observable, UndoManager}
 import net.codingwell.scalaguice.InjectorExtensions._
 import de.htwg.se.connect4.model.boardComponent.BoardInterface
+import org.bson.types.ObjectId
 import play.api.libs.json.JsValue.jsValueToJsLookup
-import play.api.libs.json.Json
+import play.api.libs.json.{JsNumber, JsString, Json}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -30,6 +31,7 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
 
   var state: ControllerState = InitializationState(this)
   var currentPlayerIndex: Int = 0
+  var currentId : ObjectId = new ObjectId();
   private val undoManager = new UndoManager
 
   def stateString: String = state.stateString()
@@ -161,6 +163,41 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
     newPlayers = newPlayers ::: List(players(1).copy(piecesLeft = 21))
     players = newPlayers
     state = InGameState(this)
+
+    implicit val system = ActorSystem(Behaviors.empty, "SingleRequest")
+    // needed for the future flatMap/onComplete in the end
+    implicit val executionContext = system.executionContext
+    val payload = Json.obj("players" -> Json.toJson(
+      for {
+        index <- 0 until players.size
+
+      } yield {
+        Json.obj(
+          "name" -> players(index).playerName,
+          "color" -> players(index).color,
+          "piecesLeft" -> players(index).piecesLeft,
+        )
+      }
+
+    ))
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(Post("http://localhost:9002/newGame", payload.toString()))
+
+    responseFuture.onComplete {
+      case Success(res) => {
+        if (res.status == StatusCodes.OK) {
+          val responseBody: Future[String] = Unmarshal(res.entity).to[String]
+          responseBody.onComplete {
+            case Success(body) => {
+              val b = Json.parse(body)
+              val idx = (b \ "id").as[String]
+              currentId = new ObjectId(idx)
+              //println("New game in mongo created.")
+            }
+            case Failure(_) => sys.error("Error in setCol")
+          }
+        }
+      }
+    }
     notifyObservers
     "created new Board \n" + getPlayerDemandString
   }
@@ -202,12 +239,15 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
 
   override def save: String = {
     val stateToSave = State(currentPlayerIndex, players, state.toString())
-    /*implicit val system = ActorSystem(Behaviors.empty, "SingleRequest")
+    implicit val system = ActorSystem(Behaviors.empty, "SingleRequest")
     // needed for the future flatMap/onComplete in the end
     implicit val executionContext = system.executionContext
-    val payload = board.getBoardAsString()
-    val responseFuture: Future[HttpResponse] = Http().singleRequest(Post("http://localhost:9002/board", payload.toString()))
-*/
+    println("IN SAVE")
+    println(boardToString)
+
+    val payload = gridToJson(board, stateToSave)
+    val responseFuture: Future[HttpResponse] = Http().singleRequest(Post("http://localhost:9002/game", payload.toString()))
+
     fileIo.save(board, stateToSave)
     "saved"
   }
@@ -232,6 +272,45 @@ class Controller @Inject()(var board: BoardInterface, var players: List[Player])
       case "PlayerWinState" => PlayerWinState
       case "InGameState" => state = InGameState(this)
     }
+  }
+
+
+  def gridToJson(board: BoardInterface, state: State) = {
+    Json.obj(
+      "id" -> currentId.toString,
+      "currentPlayerIndex" -> JsNumber(state.currentPlayerIndex),
+
+      "state" -> JsString(state.state),
+      "players" -> Json.toJson(
+        for {
+          index <- state.players.indices
+
+        } yield {
+          Json.obj(
+            "name" -> state.players(index).playerName,
+            "color" -> state.players(index).color,
+            "piecesLeft" -> state.players(index).piecesLeft,
+          )
+        }
+
+      ),
+      "board" -> Json.obj(
+        "row" -> JsNumber(board.sizeOfRows),
+        "col" -> JsNumber(board.sizeOfCols),
+        "cells" -> Json.toJson(
+          for {
+            row <- 0 until board.sizeOfRows
+            col <- 0 until board.sizeOfCols
+          } yield {
+            Json.obj(
+              "row" -> row,
+              "col" -> col,
+              "cell" -> Json.toJson(board.cell(row, col))
+            )
+          }
+        )
+      )
+    )
   }
 }
 

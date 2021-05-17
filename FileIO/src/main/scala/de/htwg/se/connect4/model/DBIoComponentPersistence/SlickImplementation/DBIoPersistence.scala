@@ -4,6 +4,7 @@ import de.htwg.se.connect4.model.boardComponent.boardBaseImpl.{Board, Cell, Colo
 import de.htwg.se.connect4.model.DBIoComponentPersistence.DBIoPersistenceInterface
 import de.htwg.se.connect4.model.playerComponent.Player
 import javax.xml.datatype.DatatypeConstants
+import org.mongodb.scala.bson.ObjectId
 import slick.jdbc.JdbcBackend.Database
 import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
@@ -45,7 +46,7 @@ class DBIoPersistence extends DBIoPersistenceInterface {
   }
   */
 
-  override def create(players: List[Player], rows: Int, cols: Int): Int = {
+  override def create(players: List[Player], rows: Int, cols: Int): String = {
     //returns inserted row with auto increment id
     val gameIdQuery = (games returning games.map(_.id)) += ((None, rows, cols))
     val gameId = Await.result(db.run(gameIdQuery), Duration("10s"))
@@ -61,13 +62,13 @@ class DBIoPersistence extends DBIoPersistenceInterface {
         Await.result(db.run(cellQuery), Duration("10s"))
       }
     }
-    gameId
+    gameId.toString
   }
 
-  override def update(id: Int, players: List[Player], board: Board): Boolean = {
+  override def update(id: String, players: List[Player], board: Board): Boolean = {
 
     val actions = DBIO.sequence(players.map(player => {
-      playersT.filter(_.name === player.playerName).update((None, player.playerName, player.color.toString(), player.piecesLeft, id))
+      playersT.filter(_.name === player.playerName).update((None, player.playerName, player.color.toString(), player.piecesLeft, id.toInt))
     }))
     Await.result(db.run(actions), Duration("10s"))
 
@@ -75,14 +76,14 @@ class DBIoPersistence extends DBIoPersistenceInterface {
     for (row <- 0 until board.sizeOfRows) {
       for (col <- 0 until board.sizeOfCols) {
         val current = board.cell(row, col)
-        cells.addOne((None, row, col, id, Some(current.color.toString()), current.isSet))
+        cells.addOne((None, row, col, id.toInt, Some(current.color.toString()), current.isSet))
         //cells += boards.filter(_.gameID === id).filter(_.xValue === row).filter(_.yValue === col).update()
 
       }
     }
 
     val boardActions = DBIO.sequence(cells.toList.map(cell => {
-      boards.filter(_.gameID === id).filter(_.xValue === cell._2).filter(_.yValue === cell._3).update(cell)
+      boards.filter(_.gameID === id.toInt).filter(_.xValue === cell._2).filter(_.yValue === cell._3).update(cell)
     }))
 
     Await.result(db.run(boardActions), Duration("10s"))
@@ -92,19 +93,19 @@ class DBIoPersistence extends DBIoPersistenceInterface {
 
   }
 
-  override def delete(id: Int): Boolean = {
-    Await.result(db.run(boards.filter(_.gameID === id).delete), Duration("10s"))
+  override def delete(id: String): Boolean = {
+    Await.result(db.run(boards.filter(_.gameID === id.toInt).delete), Duration("10s"))
     true
   }
 
-  override def read(id: Int): Option[(List[Player], Board)] = {
-    val q = playersT.filter(_.boardID === id).result
+  override def read(id: String): Option[(List[Player], Board)] = {
+    val q = playersT.filter(_.boardID === id.toInt).result
     val playerList = Await.result(db.run(q), Duration("10s"))
     val players = List[Player](new Player(playerList(0)._2, Color.toEnum(playerList(0)._3), playerList(0)._4), new Player(playerList(1)._2, Color.toEnum(playerList(1)._3), playerList(1)._4))
-    val gameq = games.filter(_.id === id).result
+    val gameq = games.filter(_.id === id.toInt).result
     val game = Await.result(db.run(gameq), Duration("10s"))
     val newBoard = new Board(game.head._2, game.head._3, false)
-    val cellq = boards.filter(_.gameID === id).result
+    val cellq = boards.filter(_.gameID === id.toInt).result
     val cellList = Await.result(db.run(cellq), Duration("10s"))
     cellList.foreach(cell => {
       newBoard.set(cell._2, cell._3, Color.toEnum(cell._5.get), cell._6)
@@ -112,5 +113,7 @@ class DBIoPersistence extends DBIoPersistenceInterface {
 
     Some(players, newBoard)
   }
+
+  override def test(): String = ???
 
 }

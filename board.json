@@ -1,18 +1,18 @@
 {
-  "currentPlayerIndex" : 0,
-  "state" : "InitializationState",
+  "currentPlayerIndex" : 1,
+  "state" : "InGameState",
   "players" : [ {
-    "name" : "test3",
+    "name" : "josh",
     "color" : {
       "color" : "red"
     },
-    "piecesLeft" : 1
+    "piecesLeft" : 20
   }, {
-    "name" : "test2",
+    "name" : "test",
     "color" : {
       "color" : "yellow"
     },
-    "piecesLeft" : 0
+    "piecesLeft" : 21
   } ],
   "board" : {
     "row" : 6,
@@ -336,9 +336,9 @@
       "row" : 5,
       "col" : 0,
       "cell" : {
-        "isSet" : false,
+        "isSet" : true,
         "color" : {
-          "color" : "empty"
+          "color" : "red"
         }
       }
     }, {

@@ -50,6 +50,15 @@ object BoardManager {
 
             )
           },
+      pathPrefix("newGame"){
+        concat(
+          post {
+            entity(as[String]) {
+              payload => complete(HttpEntity(ContentTypes.`application/json`, controller.load(payload).toString))
+            }
+          }
+        )
+      }
         )
 
     val bindingFuture = Http().bindAndHandle(route, connectionInterface, connectionPort)

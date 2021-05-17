@@ -1,11 +1,11 @@
-database:
-  image: "postgres"
-  container_name: "database"
-  ports:
-    - "5432:5432"
-  environment:
-    - POSTGRES_USER=root
-    - POSTGRES_PASSWORD=1234
+#database:
+#  image: "postgres"
+#  container_name: "database"
+#  ports:
+#    - "5432:5432"
+# environment:
+#    - POSTGRES_USER=root
+#   - POSTGRES_PASSWORD=1234
 
 mongo:
   image: mongo

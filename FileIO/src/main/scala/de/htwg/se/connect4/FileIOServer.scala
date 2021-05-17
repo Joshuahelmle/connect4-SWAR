@@ -49,8 +49,32 @@ object FileIOServer {
       },
       path("newGame") {
         concat(
+          post {
+            entity(as[String]) { payload =>
+              complete(HttpEntity(ContentTypes.`application/json`, controller.create(payload).toString))
+            }
+
+          }
+        )
+      },
+      path("update") {
+        concat(
           get {
-            complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, controller.create().toString))
+            complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, controller.update("60996d22e57e7d4ace4f0273").toString))
+          }
+        )
+      },
+      path("delete") {
+        concat(
+          get {
+            complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, controller.delete("6099669e6741bb2c07a14399").toString))
+          }
+        )
+      },
+      path("test") {
+        concat(
+          get {
+            complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, controller.test().toString))
           }
         )
       }
