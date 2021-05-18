@@ -39,6 +39,8 @@ class DBIOPersistence extends DBIoPersistenceInterface {
   //val playersT : MongoCollection[PlayerComponent] = db.getCollection("players")
   val gamesT: MongoCollection[GameComponent] = db.getCollection("games")
   val gamesD : MongoCollection[Document] = db.getCollection("games")
+  var cachedGames : Seq[GameComponent] = Seq.empty
+  Await.result(gamesT.drop().toFuture(), 10.seconds)
 
 
   //playersT.drop().toFuture()
@@ -167,8 +169,50 @@ class DBIOPersistence extends DBIoPersistenceInterface {
   }
 
   def test() : String = {
-    val t = Await.result(gamesD.find().toFuture(), Duration("10s"))
-    t.head.toString()
+    val rows = 5
+    val cols = 5
+    val b = new Board(rows, cols, false)
+    val cells = new ListBuffer[BoardComponent]
+
+    for (row <- 0 until b.sizeOfRows) {
+      for (col <- 0 until b.sizeOfCols) {
+        val isSet = b.cell(row, col).isSet
+        println(isSet)
+        val cell = BoardComponent(row, col, isSet, Color.EMPTY.toString)
+        cells += cell
+      }
+    }
+
+    cells.foreach(c => println(s"x: ${c.xValue}\t y: ${c.yValue}\t isSet: ${c.isSet}"))
+    val game = GameComponent(
+      Seq(
+        PlayerComponent("Josh", Color.RED.toString, 21),
+        PlayerComponent("Test", Color.YELLOW.toString, 21)
+      ), cells.toList,
+      b.sizeOfRows, b.sizeOfCols
+    )
+
+    //game.board.rows.foreach(v => v.foreach(c => println(c.isSet)))
+    val g = Await.result(gamesT.insertOne(game).toFuture(), Duration("10s"))
+    ""
+  }
+
+  override def getAllGames: String = {
+    if(cachedGames == Seq.empty) {
+      cachedGames = Await.result(gamesT.find().toFuture(), 10.seconds)
+    }
+    //val cachedGames = Await.result(gamesT.find().toFuture(), 10.seconds)
+    Json.obj( "games" -> Json.toJson(
+    for {
+      el <- cachedGames.map(_._id).zipWithIndex
+
+         } yield {
+      Json.obj(
+        "idx" -> el._2,
+        "id" -> el._1.toHexString
+      )
+    } )).toString()
+
   }
 
 }

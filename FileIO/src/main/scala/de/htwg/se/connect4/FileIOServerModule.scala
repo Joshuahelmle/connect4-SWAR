@@ -10,5 +10,6 @@ class FileIOServerModule extends AbstractModule with ScalaModule {
   override def configure(): Unit = {
     bind[FileIoInterface].to[model.fileIoComponent.fileIoJsonImpl.FileIO]
     bind[DBIoPersistenceInterface].to[model.DBIoComponentPersistence.MongoDBImplementation.DBIOPersistence]
+    //bind[DBIoPersistenceInterface].to[model.DBIoComponentPersistence.SlickImplementation.DBIoPersistence]
   }
 }

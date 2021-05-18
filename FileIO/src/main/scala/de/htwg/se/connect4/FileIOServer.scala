@@ -32,7 +32,7 @@ object FileIOServer {
     val route = concat(
       path("games") {
         get {
-          complete(HttpEntity(ContentTypes.`application/json`, controller.getAllGames().toString()))
+          complete(HttpEntity(ContentTypes.`application/json`, controller.getAllGames))
         }
       },
       path("game") {

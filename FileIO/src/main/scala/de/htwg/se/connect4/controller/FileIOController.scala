@@ -28,14 +28,8 @@ class FileIOController {
     gridToJson(board, state)
   }
 
-  def getAllGames() : JsValue = {
-  Json.obj("games" -> Json.toJson(for {game <- games } yield {
-      Json.obj(
-        "game" -> game
-      )
-    })
-
-    )
+  def getAllGames() : String = {
+  databaseIO.getAllGames
   }
 
   def save(payload : String): Unit ={
@@ -157,6 +151,6 @@ class FileIOController {
   }
 
   def test(): String = {
-    databaseIO.test()
+    databaseIO.test
   }
 }

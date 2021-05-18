@@ -14,6 +14,8 @@ trait DBIoPersistenceInterface {
 
   def read(id : String) : Option[(List[Player], Board)]
 
-  def test() : String
+  def test : String
+
+  def getAllGames : String
 
 }

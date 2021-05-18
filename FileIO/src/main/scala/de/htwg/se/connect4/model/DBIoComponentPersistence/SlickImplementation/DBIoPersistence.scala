@@ -5,6 +5,7 @@ import de.htwg.se.connect4.model.DBIoComponentPersistence.DBIoPersistenceInterfa
 import de.htwg.se.connect4.model.playerComponent.Player
 import javax.xml.datatype.DatatypeConstants
 import org.mongodb.scala.bson.ObjectId
+import play.api.libs.json.Json
 import slick.jdbc.JdbcBackend.Database
 import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
@@ -12,7 +13,7 @@ import slick.jdbc.PostgresProfile.api._
 import scala.::
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, DurationInt}
 
 class DBIoPersistence extends DBIoPersistenceInterface {
 
@@ -35,8 +36,10 @@ class DBIoPersistence extends DBIoPersistenceInterface {
     games.schema.createIfNotExists
   )
   db.run(setup)
+  db.run(games.delete)
 
   val setupFuture = db.run(setup);
+  var cachedGames : Seq[(Option[Int], Int, Int)] = Seq.empty
 
   /*
   def setupDB(): Unit ={
@@ -114,6 +117,36 @@ class DBIoPersistence extends DBIoPersistenceInterface {
     Some(players, newBoard)
   }
 
-  override def test(): String = ???
+  override def test(): String = {
+    val gameIdQuery = (games returning games.map(_.id)) += ((None, 5, 5))
+    val gameId = Await.result(db.run(gameIdQuery), Duration("10s"))
+
+    val playerIDQuery = (playersT returning playersT.map(_.id)) += ((None, "Josh", "RED", 21, gameId))
+    val player2IDQuery = (playersT returning playersT.map(_.id)) += ((None, "Test", "YELLOW", 21, gameId))
+
+
+    for (row <- 0 until 5) {
+      for (col <- 0 until 5) {
+        val cellQuery = (boards returning boards.map(_.id)) += ((None, row, col, gameId, Some(Color.EMPTY.toString()), false))
+        Await.result(db.run(cellQuery), Duration("10s"))
+      }
+    }
+    ""
+  }
+
+  override def getAllGames: String = {
+    /*if(cachedGames == Seq.empty){
+      cachedGames = Await.result(db.run(games.result), 10.seconds)
+    }*/
+    val cachedGames = Await.result(db.run(games.result), 10.seconds)
+    Json.obj(
+    "games" -> Json.toJson(
+      for(el <- cachedGames.flatMap(_._1).zipWithIndex) yield {
+      Json.obj(
+        "idx" -> el._2,
+        "id" -> el._1
+      )
+    })).toString()
+  }
 
 }

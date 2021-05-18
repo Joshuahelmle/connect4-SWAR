@@ -66,11 +66,20 @@ lazy val fileio = project.in(file("FileIO")).settings(libraryDependencies ++= co
 
 
 
+enablePlugins(GatlingPlugin)
+
+scalacOptions := Seq(
+  "-encoding", "UTF-8", "-target:jvm-1.8",
+  "-deprecation", "-feature", "-unchecked",
+  "-language:implicitConversions", "-language:postfixOps")
+val gatlingVersion = "3.5.1"
+libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % gatlingVersion % "test,it"
+libraryDependencies += "io.gatling"            % "gatling-test-framework"    % gatlingVersion % "test,it"
 
 
 lazy val dependencies =
   new {
-    val AkkaVersion = "2.6.8"
+    val AkkaVersion = "2.6.11"
     val AkkaHttpVersion = "10.2.4"
 
     val akka = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
